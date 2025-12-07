@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opofinance Market Analysis Dashboard - Phase 2</title>
+    <style>
+        :root {
+            --color-primary: #2196F3;
+            --color-primary-dark: #1976D2;
+            --color-secondary: #4CAF50;
+            --color-warning: #FF9800;
+            --color-danger: #F44336;
+            --color-info: #00BCD4;
+            --color-bg: #f5f7fa;
+            --color-surface: #ffffff;
+            --color-text: #1a1a1a;
+            --color-text-secondary: #666666;
+            --color-border: #e0e0e0;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            color: white;
+            padding: 30px 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            background: var(--color-surface);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .nav-tabs button {
+            padding: 10px 20px;
+            border: none;
+            background: var(--color-bg);
+            color: var(--color-text);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tabs button:hover {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .nav-tabs button.active {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--color-surface);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .stat-card h3 {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--color-text-secondary);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--color-primary);
+        }
+
+        .stat-card.warning {
+            border-left-color: var(--color-warning);
+        }
+
+        .stat-card.warning .value {
+            color: var(--color-warning);
+        }
+
+        .stat-card.success {
+            border-left-color: var(--color-secondary);
+        }
+
+        .stat-card.success .value {
+            color: var(--color-secondary);
+        }
+
+        .stat-card.danger {
+            border-left-color: var(--color-danger);
+        }
+
+        .stat-card.danger .value {
+            color: var(--color-danger);
+        }
+
+        .chart-container {
+            background: var(--color-surface);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .chart-container h3 {
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: var(--color-text);
+        }
+
+        .country-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .country-card {
+            background: var(--color-surface);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .country-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .country-header {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .country-body {
+            padding: 15px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--color-border);
+            font-size: 13px;
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            color: var(--color-text-secondary);
+            font-weight: 500;
+        }
+
+        .metric-value {
+            color: var(--color-text);
+            font-weight: bold;
+        }
+
+        .table-container {
+            background: var(--color-surface);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: var(--color-bg);
+        }
+
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--color-text);
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        tbody tr:hover {
+            background: var(--color-bg);
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            height: 300px;
+            padding: 20px 0;
+        }
+
+        .bar {
+            flex: 1;
+            background: linear-gradient(180deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            border-radius: 4px 4px 0 0;
+            position: relative;
+            min-height: 20px;
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            white-space: nowrap;
+            width: 100%;
+            text-align: center;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: bold;
+            font-size: 12px;
+            color: var(--color-primary);
+        }
+
+        .budget-allocation {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .allocation-item {
+            background: var(--color-bg);
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid var(--color-primary);
+            text-align: center;
+        }
+
+        .allocation-item .channel {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .allocation-item .percentage {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--color-primary);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-primary {
+            background: rgba(33, 150, 243, 0.2);
+            color: var(--color-primary);
+        }
+
+        .badge-success {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--color-secondary);
+        }
+
+        .badge-warning {
+            background: rgba(255, 152, 0, 0.2);
+            color: var(--color-warning);
+        }
+
+        .comparison-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .comparison-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .comparison-label {
+            min-width: 120px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .comparison-bar {
+            flex: 1;
+            height: 30px;
+            background: var(--color-bg);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .comparison-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-info) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--color-text-secondary);
+            font-size: 12px;
+            margin-top: 40px;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 20px;
+            }
+
+            .overview-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .country-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .nav-tabs button {
+                width: 100%;
+            }
+
+            table {
+                font-size: 11px;
+            }
+
+            td, th {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Opofinance Market Analysis Dashboard</h1>
+            <p>Phase 2 Strategy - Multi-Market Expansion Analysis (July 2025)</p>
+        </header>
+
+        <div class="nav-tabs">
+            <button class="tab-btn active" data-tab="overview">Overview</button>
+            <button class="tab-btn" data-tab="markets">Markets by Country</button>
+            <button class="tab-btn" data-tab="budgets">Budget & Revenue</button>
+            <button class="tab-btn" data-tab="performance">Performance Metrics</button>
+            <button class="tab-btn" data-tab="detailed">Detailed Analysis</button>
+        </div>
+
+        <!-- OVERVIEW TAB -->
+        <div id="overview" class="tab-content active">
+            <div class="overview-grid">
+                <div class="stat-card success">
+                    <h3>Total Budget Allocated</h3>
+                    <div class="value">$61,500</div>
+                </div>
+                <div class="stat-card success">
+                    <h3>Projected Total Revenue</h3>
+                    <div class="value">$189,823</div>
+                </div>
+                <div class="stat-card primary">
+                    <h3>Countries Analyzed</h3>
+                    <div class="value">9</div>
+                </div>
+                <div class="stat-card warning">
+                    <h3>ROI Multiple</h3>
+                    <div class="value">3.1x</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Revenue Projection by Country</h3>
+                <div class="bar-chart">
+                    <div class="bar" style="height: 5.8%;"><span class="bar-value">$11.1K</span><span class="bar-label">Mexico</span></div>
+                    <div class="bar" style="height: 16.9%;"><span class="bar-value">$32.0K</span><span class="bar-label">Taiwan</span></div>
+                    <div class="bar" style="height: 9.2%;"><span class="bar-value">$17.6K</span><span class="bar-label">Chile</span></div>
+                    <div class="bar" style="height: 11.3%;"><span class="bar-value">$21.5K</span><span class="bar-label">Thailand</span></div>
+                    <div class="bar" style="height: 12.4%;"><span class="bar-value">$23.5K</span><span class="bar-label">Singapore</span></div>
+                    <div class="bar" style="height: 5.3%;"><span class="bar-value">$10.1K</span><span class="bar-label">Indonesia</span></div>
+                    <div class="bar" style="height: 14.8%;"><span class="bar-value">$28.1K</span><span class="bar-label">Malaysia</span></div>
+                    <div class="bar" style="height: 16.8%;"><span class="bar-value">$32.0K</span><span class="bar-label">Ghana</span></div>
+                    <div class="bar" style="height: 7.4%;"><span class="bar-value">$14.0K</span><span class="bar-label">Kenya</span></div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Budget Distribution</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div style="text-align: center; padding: 15px; background: #f5f7fa; border-radius: 6px;">
+                        <div style="font-size: 12px; color: #666; margin-bottom: 8px;">Average Budget per Country</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #2196F3;">$6,833</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: #f5f7fa; border-radius: 6px;">
+                        <div style="font-size: 12px; color: #666; margin-bottom: 8px;">Highest Budget</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #FF9800;">Singapore ($9K)</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: #f5f7fa; border-radius: 6px;">
+                        <div style="font-size: 12px; color: #666; margin-bottom: 8px;">Average Revenue per Country</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #4CAF50;">$21,091</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MARKETS BY COUNTRY TAB -->
+        <div id="markets" class="tab-content">
+            <div class="country-grid">
+                <!-- Mexico -->
+                <div class="country-card">
+                    <div class="country-header">🇲🇽 Mexico</div>
+                    <div class="country-body">
+                        <div class="metric-row">
+                            <span class="metric-label">Budget</span>
+                            <span class="metric-value">$6,000</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Est Revenue</span>
+                            <span class="metric-value">$11,050</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Active Traders</span>
+                            <span class="metric-value">40,000</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">ARPU</span>
+                            <span class="metric-value">$600</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Market Value</span>
+                            <span class="metric-value">$3.6M</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">CAC</span>
+                            <span class="metric-value">$58</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Growth Rate</span>
+                            <span class="metric-value">20%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Regulation</span>
+                            <span class="metric-value"><span class="badge badge-primary">CNBV</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Taiwan -->
+                <div class="country-card">
+                    <div class="country-header">🇹🇼 Taiwan</div>
+                    <div class="country-body">
+                        <div class="metric-row">
+                            <span class="metric-label">Budget</span>
+                            <span class="metric-value">$6,900</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Est Revenue</span>
+                            <span class="metric-value">$32,046</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Active Traders</span>
+                            <span class="metric-value">12,000</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">ARPU</span>
+                            <span class="metric-value">$800</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Market Value</span>
+                            <span class="metric-value">$2.0M</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">CAC</span>
+                            <span class="metric-value">$85</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Growth Rate</span>
+                            <span class="metric-value">15%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Regulation</span>
+                            <span class="metric-value"><span class="badge badge-success">FSC</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chile -->
+                <div class="country-card">
+                    <div class="country-header">🇨🇱 Chile</div>
+                    <div class="country-body">
+                        <div class="metric-row">
+                            <span class="metric-label">Budget</span>
+                            <span class="metric-value">$6,000</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Est Revenue</span>
+                            <span class="metric-value">$17,550</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Active Traders</span>
+                            <span class="metric-value">4,000</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">ARPU</span>
+                            <span class="metric-value">$500</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Market Value</span>
+                            <span class="metric-value">$769.3M</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">CAC</span>
+                            <span class="metric-value">$55</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Growth Rate</span>
+                            <span class="metric-value">40%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Regulation</span>
+                            <span class="metric-value"><span class="badge badge-primary">CMF</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thailand -->
+                <div class="country-card">
+                    <div class="country-header">🇹🇭 Thailand</div>
+                    <div class="country-body">
+                        <div class="metric-row">
+                            <span class="metric-label">Budget</span>
+                            <span class="metric-value">$7,500</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Est Revenue</span>
+                            <span class="metric-value">$21,450</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Active Traders</span>
+                            <span class="metric-value">15,000</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">ARPU</span>
+                            <span class="metric-value">$350</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Market Value</span>
+                            <span class="metric-value">$1.3M</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">CAC</span>
+                            <span class="metric-value">$45</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Growth Rate</span>
+                            <span class="metric-value">25%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Regulation</span>
+                            <span class="metric-value"><span class="badge badge-warning">SEC</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Singapore -->
+                <div class="country-card">
+                    <div class="country-header">🇸🇬 Singapore</div>
+                    <div class="country-body">
+                        <div class="metric-row">
+                            <span class="metric-label">Budget</span>
+                            <span class="metric-value">$9,000</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Est Revenue</span>
+                            <span class="metric-value">$23,500</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Active Traders</span>
+                            <span class="metric-value">38,000</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">ARPU</span>
+                            <span class="metric-value">$1,200</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Market Value</span>
+                            <span class="metric-value">$885.4M</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">CAC</span>
+                            <span class="metric-value">$95</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Growth Rate</span>
+                            <span class="metric-value">5%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Regulation</span>
+                            <span class="metric-value"><span class="badge badge-success">MAS</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Indonesia -->
+                <div class="country-card">
+                    <div class="country-header">🇮🇩 Indonesia</div>
+                    <div class="country-body">
+                        <div class="metric-row">
+                            <span class="metric-label">Budget</span>
+                            <span class="metric-value">$6,600</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Est Revenue</span>
+                            <span class="metric-value">$10,140</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Active Traders</span>
+                            <span class="metric-value">80,000</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">ARPU</span>
+                            <span class="metric-value">$150</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Market Value</span>
+                            <span class="metric-value">$1.3M</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">CAC</span>
+                            <span class="metric-value">$40</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Growth Rate</span>
+                            <span class="metric-value">30%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Regulation</span>
+                            <span class="metric-value"><span class="badge badge-primary">BAPPEBTI</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Malaysia -->
+                <div class="country-card">
+                    <div class="country-header">🇲🇾 Malaysia</div>
+                    <div class="country-body">
+                        <div class="metric-row">
+                            <span class="metric-label">Budget</span>
+                            <span class="metric-value">$7,500</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Est Revenue</span>
+                            <span class="metric-value">$28,087</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Active Traders</span>
+                            <span class="metric-value">25,000</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">ARPU</span>
+                            <span class="metric-value">$400</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Market Value</span>
+                            <span class="metric-value">$899.6M</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">CAC</span>
+                            <span class="metric-value">$55</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Growth Rate</span>
+                            <span class="metric-value">65%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Regulation</span>
+                            <span class="metric-value"><span class="badge badge-warning">SC</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ghana -->
+                <div class="country-card">
+                    <div class="country-header">🇬🇭 Ghana</div>
+                    <div class="country-body">
+                        <div class="metric-row">
+                            <span class="metric-label">Budget</span>
+                            <span class="metric-value">$6,000</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Est Revenue</span>
+                            <span class="metric-value">$32,000</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Active Traders</span>
+                            <span class="metric-value">3,000</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">ARPU</span>
+                            <span class="metric-value">$200</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Market Value</span>
+                            <span class="metric-value">$139.5M</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">CAC</span>
+                            <span class="metric-value">$35</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Growth Rate</span>
+                            <span class="metric-value">65%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Regulation</span>
+                            <span class="metric-value"><span class="badge badge-danger">BoG</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kenya -->
+                <div class="country-card">
+                    <div class="country-header">🇰🇪 Kenya</div>
+                    <div class="country-body">
+                        <div class="metric-row">
+                            <span class="metric-label">Budget</span>
+                            <span class="metric-value">$6,000</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Est Revenue</span>
+                            <span class="metric-value">$14,000</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Active Traders</span>
+                            <span class="metric-value">8,000</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">ARPU</span>
+                            <span class="metric-value">$100</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Market Value</span>
+                            <span class="metric-value">$90.1M</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">CAC</span>
+                            <span class="metric-value">$28</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Growth Rate</span>
+                            <span class="metric-value">200%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Regulation</span>
+                            <span class="metric-value"><span class="badge badge-success">CMA</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BUDGET & REVENUE TAB -->
+        <div id="budgets" class="tab-content">
+            <div class="chart-container">
+                <h3>Budget vs Revenue Comparison</h3>
+                <div class="comparison-chart">
+                    <div class="comparison-row">
+                        <div class="comparison-label">Mexico</div>
+                        <div class="comparison-bar"><div class="comparison-fill" style="width: 26%;">$11.1K</div></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-label">Taiwan</div>
+                        <div class="comparison-bar"><div class="comparison-fill" style="width: 100%;">$32.0K</div></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-label">Chile</div>
+                        <div class="comparison-bar"><div class="comparison-fill" style="width: 55%;">$17.6K</div></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-label">Thailand</div>
+                        <div class="comparison-bar"><div class="comparison-fill" style="width: 67%;">$21.5K</div></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-label">Singapore</div>
+                        <div class="comparison-bar"><div class="comparison-fill" style="width: 73%;">$23.5K</div></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-label">Indonesia</div>
+                        <div class="comparison-bar"><div class="comparison-fill" style="width: 32%;">$10.1K</div></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-label">Malaysia</div>
+                        <div class="comparison-bar"><div class="comparison-fill" style="width: 88%;">$28.1K</div></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-label">Ghana</div>
+                        <div class="comparison-bar"><div class="comparison-fill" style="width: 100%;">$32.0K</div></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-label">Kenya</div>
+                        <div class="comparison-bar"><div class="comparison-fill" style="width: 44%;">$14.0K</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <h3 style="margin-bottom: 15px;">Financial Summary</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Country</th>
+                            <th>Budget ($)</th>
+                            <th>Est Revenue ($)</th>
+                            <th>ROI</th>
+                            <th>Monthly Budget ($)</th>
+                            <th>Break-Even (Mo)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Mexico</td>
+                            <td>6,000</td>
+                            <td>11,050</td>
+                            <td>500%</td>
+                            <td>2,000</td>
+                            <td>1.5</td>
+                        </tr>
+                        <tr>
+                            <td>Taiwan</td>
+                            <td>6,900</td>
+                            <td>32,046</td>
+                            <td>650%</td>
+                            <td>2,300</td>
+                            <td>2.5</td>
+                        </tr>
+                        <tr>
+                            <td>Chile</td>
+                            <td>6,000</td>
+                            <td>17,550</td>
+                            <td>100%</td>
+                            <td>2,000</td>
+                            <td>1.5</td>
+                        </tr>
+                        <tr>
+                            <td>Thailand</td>
+                            <td>7,500</td>
+                            <td>21,450</td>
+                            <td>40%</td>
+                            <td>2,500</td>
+                            <td>1.3</td>
+                        </tr>
+                        <tr>
+                            <td>Singapore</td>
+                            <td>9,000</td>
+                            <td>23,500</td>
+                            <td>1000%</td>
+                            <td>3,000</td>
+                            <td>1.6</td>
+                        </tr>
+                        <tr>
+                            <td>Indonesia</td>
+                            <td>6,600</td>
+                            <td>10,140</td>
+                            <td>55%</td>
+                            <td>2,200</td>
+                            <td>1.8</td>
+                        </tr>
+                        <tr>
+                            <td>Malaysia</td>
+                            <td>7,500</td>
+                            <td>28,087</td>
+                            <td>750%</td>
+                            <td>2,500</td>
+                            <td>2.0</td>
+                        </tr>
+                        <tr>
+                            <td>Ghana</td>
+                            <td>6,000</td>
+                            <td>32,000</td>
+                            <td>200%</td>
+                            <td>2,000</td>
+                            <td>1.5</td>
+                        </tr>
+                        <tr>
+                            <td>Kenya</td>
+                            <td>6,000</td>
+                            <td>14,000</td>
+                            <td>30%</td>
+                            <td>2,000</td>
+                            <td>1.8</td>
+                        </tr>
+                        <tr style="font-weight: bold; background: #f5f7fa;">
+                            <td>TOTAL</td>
+                            <td>61,500</td>
+                            <td>189,823</td>
+                            <td>310%</td>
+                            <td>20,100</td>
+                            <td>Avg: 1.7</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PERFORMANCE METRICS TAB -->
+        <div id="performance" class="tab-content">
+            <div class="chart-container">
+                <h3>ARPU (Average Revenue Per User) by Country</h3>
+                <div class="comparison-chart">
+                    <div class="comparison-row">
+                        <div class="comparison-label">Singapore</div>
+                        <div class="comparison-bar"><div class="comparison-fill" style="width: 100%; background: linear-gradient(90deg, #FF9800 0%, #F44336 100%);">$1,200</div></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-label">Taiwan</div>
+                        <div class="comparison-bar"><div class="comparison-fill" style="width: 67%; background: linear-gradient(90deg, #FF9800 0%, #F44336 100%);">$800</div></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-label">Mexico</div>
+                        <div class="comparison-bar"><div class="comparison-fill" style="width: 50%; background: linear-gradient(90deg, #FF9800 0%, #F44336 100%);">$600</div></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-label">Malaysia</div>
+                        <div class="comparison-bar"><div class="comparison-fill" style="width: 33%; background: linear-gradient(90deg, #FF9800 0%, #F44336 100%);">$400</div></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-label">Thailand</div>
+                        <div class="comparison-bar"><div class="comparison-fill" style="width: 29%; background: linear-gradient(90deg, #FF9800 0%, #F44336 100%);">$350</div></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-label">Chile</div>
+                        <div class="comparison-bar"><div class="comparison-fill" style="width: 42%; background: linear-gradient(90deg, #FF9800 0%, #F44336 100%);">$500</div></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-label">Indonesia</div>
+                        <div class="comparison-bar"><div class="comparison-fill" style="width: 13%; background: linear-gradient(90deg, #FF9800 0%, #F44336 100%);">$150</div></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-label">Ghana</div>
+                        <div class="comparison-bar"><div class="comparison-fill" style="width: 17%; background: linear-gradient(90deg, #FF9800 0%, #F44336 100%);">$200</div></div>
+                    </div>
+                    <div class="comparison-row">
+                        <div class="comparison-label">Kenya</div>
+                        <div class="comparison-bar"><div class="comparison-fill" style="width: 8%; background: linear-gradient(90deg, #FF9800 0%, #F44336 100%);">$100</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Market Maturity Score & Growth Rate</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Country</th>
+                            <th>Market Maturity</th>
+                            <th>Maturity Score</th>
+                            <th>Growth Rate</th>
+                            <th>CAC ($)</th>
+                            <th>ROI Range (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Mexico</td>
+                            <td>Medium</td>
+                            <td>37.5</td>
+                            <td>20%</td>
+                            <td>$58</td>
+                            <td>400-600%</td>
+                        </tr>
+                        <tr>
+                            <td>Taiwan</td>
+                            <td>High</td>
+                            <td>85.1</td>
+                            <td>15%</td>
+                            <td>$85</td>
+                            <td>500-800%</td>
+                        </tr>
+                        <tr>
+                            <td>Chile</td>
+                            <td>Medium</td>
+                            <td>62.7</td>
+                            <td>40%</td>
+                            <td>$55</td>
+                            <td>80-120%</td>
+                        </tr>
+                        <tr>
+                            <td>Thailand</td>
+                            <td>Medium</td>
+                            <td>42</td>
+                            <td>25%</td>
+                            <td>$45</td>
+                            <td>30-50%</td>
+                        </tr>
+                        <tr>
+                            <td>Singapore</td>
+                            <td>High</td>
+                            <td>100</td>
+                            <td>5%</td>
+                            <td>$95</td>
+                            <td>800-1200%</td>
+                        </tr>
+                        <tr>
+                            <td>Indonesia</td>
+                            <td>Low</td>
+                            <td>25.9</td>
+                            <td>30%</td>
+                            <td>$40</td>
+                            <td>40-70%</td>
+                        </tr>
+                        <tr>
+                            <td>Malaysia</td>
+                            <td>Medium</td>
+                            <td>53</td>
+                            <td>65%</td>
+                            <td>$55</td>
+                            <td>600-900%</td>
+                        </tr>
+                        <tr>
+                            <td>Ghana</td>
+                            <td>Low</td>
+                            <td>53</td>
+                            <td>65%</td>
+                            <td>$35</td>
+                            <td>100-300%</td>
+                        </tr>
+                        <tr>
+                            <td>Kenya</td>
+                            <td>Low</td>
+                            <td>12.8</td>
+                            <td>200%</td>
+                            <td>$28</td>
+                            <td>20-40%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="chart-container">
+                <h3>User Acquisition Forecast (3 Months)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Country</th>
+                            <th>Target Users</th>
+                            <th>Monthly Budget ($)</th>
+                            <th>Break-Even Duration</th>
+                            <th>Processing Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Mexico</td>
+                            <td>100-200</td>
+                            <td>$2,000</td>
+                            <td>1.5 months</td>
+                            <td>6-9 months</td>
+                        </tr>
+                        <tr>
+                            <td>Taiwan</td>
+                            <td>150-300</td>
+                            <td>$2,300</td>
+                            <td>2.5 months</td>
+                            <td>6-12 months</td>
+                        </tr>
+                        <tr>
+                            <td>Chile</td>
+                            <td>100-200</td>
+                            <td>$2,000</td>
+                            <td>1.5 months</td>
+                            <td>3-4 months</td>
+                        </tr>
+                        <tr>
+                            <td>Thailand</td>
+                            <td>100-300</td>
+                            <td>$2,500</td>
+                            <td>1.3 months</td>
+                            <td>4-6 months</td>
+                        </tr>
+                        <tr>
+                            <td>Singapore</td>
+                            <td>100-200</td>
+                            <td>$3,000</td>
+                            <td>1.6 months</td>
+                            <td>3-4 months</td>
+                        </tr>
+                        <tr>
+                            <td>Indonesia</td>
+                            <td>200-250</td>
+                            <td>$2,200</td>
+                            <td>1.8 months</td>
+                            <td>4-8 months</td>
+                        </tr>
+                        <tr>
+                            <td>Malaysia</td>
+                            <td>250-350</td>
+                            <td>$2,500</td>
+                            <td>2.0 months</td>
+                            <td>3-4 months</td>
+                        </tr>
+                        <tr>
+                            <td>Ghana</td>
+                            <td>300-400</td>
+                            <td>$2,000</td>
+                            <td>1.5 months</td>
+                            <td>12 months</td>
+                        </tr>
+                        <tr>
+                            <td>Kenya</td>
+                            <td>300-400</td>
+                            <td>$2,000</td>
+                            <td>1.8 months</td>
+                            <td>3-6 months</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- DETAILED ANALYSIS TAB -->
+        <div id="detailed" class="tab-content">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                <div class="chart-container">
+                    <h3>Budget Allocation by Channel - Mexico</h3>
+                    <div class="budget-allocation">
+                        <div class="allocation-item">
+                            <div class="channel">Google Ads</div>
+                            <div class="percentage">40%</div>
+                        </div>
+                        <div class="allocation-item" style="border-left-color: #FF9800;">
+                            <div class="channel">Meta Ads</div>
+                            <div class="percentage" style="color: #FF9800;">15%</div>
+                        </div>
+                        <div class="allocation-item" style="border-left-color: #4CAF50;">
+                            <div class="channel">Influencer Marketing</div>
+                            <div class="percentage" style="color: #4CAF50;">15%</div>
+                        </div>
+                        <div class="allocation-item" style="border-left-color: #F44336;">
+                            <div class="channel">TikTok Ads</div>
+                            <div class="percentage" style="color: #F44336;">10%</div>
+                        </div>
+                        <div class="allocation-item" style="border-left-color: #9C27B0;">
+                            <div class="channel">YouTube Ads</div>
+                            <div class="percentage" style="color: #9C27B0;">10%</div>
+                        </div>
+                        <div class="allocation-item" style="border-left-color: #00BCD4;">
+                            <div class="channel">SEO</div>
+                            <div class="percentage" style="color: #00BCD4;">10%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3>Budget Allocation by Channel - Taiwan</h3>
+                    <div class="budget-allocation">
+                        <div class="allocation-item">
+                            <div class="channel">Google Ads</div>
+                            <div class="percentage">35%</div>
+                        </div>
+                        <div class="allocation-item" style="border-left-color: #FF9800;">
+                            <div class="channel">YouTube Ads</div>
+                            <div class="percentage" style="color: #FF9800;">20%</div>
+                        </div>
+                        <div class="allocation-item" style="border-left-color: #F44336;">
+                            <div class="channel">TikTok Ads</div>
+                            <div class="percentage" style="color: #F44336;">15%</div>
+                        </div>
+                        <div class="allocation-item" style="border-left-color: #4CAF50;">
+                            <div class="channel">Meta Ads</div>
+                            <div class="percentage" style="color: #4CAF50;">10%</div>
+                        </div>
+                        <div class="allocation-item" style="border-left-color: #9C27B0;">
+                            <div class="channel">Social Networks</div>
+                            <div class="percentage" style="color: #9C27B0;">10%</div>
+                        </div>
+                        <div class="allocation-item" style="border-left-color: #00BCD4;">
+                            <div class="channel">SEO</div>
+                            <div class="percentage" style="color: #00BCD4;">10%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3>Regulatory Environment & Market Entry Barriers</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Country</th>
+                            <th>Regulation</th>
+                            <th>Entry Barriers</th>
+                            <th>Localization Priority</th>
+                            <th>Investment Level</th>
+                            <th>Competition Intensity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Mexico</td>
+                            <td><span class="badge badge-primary">CNBV Lenient</span></td>
+                            <td>Medium</td>
+                            <td>Spanish</td>
+                            <td>Medium</td>
+                            <td>High</td>
+                        </tr>
+                        <tr>
+                            <td>Taiwan</td>
+                            <td><span class="badge badge-success">FSC Regulated</span></td>
+                            <td>High</td>
+                            <td>Traditional Chinese</td>
+                            <td>High</td>
+                            <td>Medium-High</td>
+                        </tr>
+                        <tr>
+                            <td>Chile</td>
+                            <td><span class="badge badge-primary">CMF Fintech</span></td>
+                            <td>High</td>
+                            <td>Spanish</td>
+                            <td>Low-Medium</td>
+                            <td>Medium</td>
+                        </tr>
+                        <tr>
+                            <td>Thailand</td>
+                            <td><span class="badge badge-warning">SEC Limited</span></td>
+                            <td>Medium</td>
+                            <td>Thai</td>
+                            <td>Medium</td>
+                            <td>High</td>
+                        </tr>
+                        <tr>
+                            <td>Singapore</td>
+                            <td><span class="badge badge-success">MAS Stringent</span></td>
+                            <td>High</td>
+                            <td>English</td>
+                            <td>High</td>
+                            <td>Very High</td>
+                        </tr>
+                        <tr>
+                            <td>Indonesia</td>
+                            <td><span class="badge badge-primary">BAPPEBTI Required</span></td>
+                            <td>High</td>
+                            <td>Bahasa Indonesia</td>
+                            <td>Medium</td>
+                            <td>Medium</td>
+                        </tr>
+                        <tr>
+                            <td>Malaysia</td>
+                            <td><span class="badge badge-warning">SC Warnings</span></td>
+                            <td>Medium</td>
+                            <td>Bahasa Malaysia</td>
+                            <td>Low</td>
+                            <td>High</td>
+                        </tr>
+                        <tr>
+                            <td>Ghana</td>
+                            <td><span class="badge badge-danger">BoG Restricted</span></td>
+                            <td>Medium</td>
+                            <td>English</td>
+                            <td>Low</td>
+                            <td>Low</td>
+                        </tr>
+                        <tr>
+                            <td>Kenya</td>
+                            <td><span class="badge badge-success">CMA Licensed</span></td>
+                            <td>Medium</td>
+                            <td>English/Swahili</td>
+                            <td>Low</td>
+                            <td>Low</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="chart-container">
+                <h3>Strategic Recommendations</h3>
+                <div style="padding: 15px; background: #f5f7fa; border-radius: 6px; line-height: 1.8;">
+                    <h4 style="color: #2196F3; margin-top: 0;">🎯 Tier 1 Priority Markets (Immediate Launch)</h4>
+                    <p><strong>Singapore, Taiwan, Malaysia, Ghana:</strong> High revenue potential, clear regulatory paths, and favorable ROI ratios (800-1200%). Focus resources here.</p>
+                    
+                    <h4 style="color: #FF9800; margin-top: 15px;">⚠️ Tier 2 Priority Markets (Fast-Track)</h4>
+                    <p><strong>Mexico, Chile, Thailand:</strong> Medium barriers, solid growth potential (20-40% FX growth). Medium-term expansion with Spanish/Thai localization.</p>
+                    
+                    <h4 style="color: #4CAF50; margin-top: 15px;">📈 Tier 3 Emerging Markets (Scale Phase)</h4>
+                    <p><strong>Indonesia, Kenya:</strong> High growth rates (30-200%), large addressable markets, but lower ARPUs. Ideal for volume-based strategies.</p>
+                    
+                    <h4 style="color: #1976D2; margin-top: 15px;">💡 Key Success Factors</h4>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>Invest heavily in Google Ads (35-45% budget) across all markets</li>
+                        <li>Customize payment methods by region (PromptPay for Thailand, GoPay for Indonesia, M-Pesa for Kenya)</li>
+                        <li>Break-even achievable within 1.3-2.5 months in most markets</li>
+                        <li>Prioritize regulatory compliance in tier-1 markets (Singapore, Taiwan)</li>
+                        <li>Leverage influencer marketing in Latin American and African markets</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Opofinance Phase 2 Market Analysis Dashboard | Data as of July 2025 | Interactive Analysis Tool</p>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabName = button.getAttribute('data-tab');
+                
+                // Remove active class from all buttons and contents
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Add active class to clicked button and corresponding content
+                button.classList.add('active');
+                document.getElementById(tabName).classList.add('active');
+            });
+        });
+
+        // Smooth scroll for better UX
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
